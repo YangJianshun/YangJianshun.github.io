@@ -1,0 +1,183 @@
+*{
+    -moz-user-select:none; /*火狐*/
+    -webkit-user-select:none; /*webkit浏览器*/
+    -ms-user-select:none; /*IE10*/
+    -khtml-user-select:none; /*早期浏览器*/
+    user-select:none;
+}
+body {
+    background-color: rgba(0,0,0,0.8);;
+}
+#wrap {
+    position: relative;
+}
+#map {
+    position: relative;
+    margin: 120px auto;
+    height: 400px;
+    /* height: 60px; */
+    width: 800px;
+    /* width: 80px; */
+    background-color: #CCC;
+    background-color:slategrey;
+    /* color: orange; */
+}
+#map div{
+    border-radius: 5px ;              
+    border: 1px solid slategrey;
+    box-sizing: border-box;
+}
+#control {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 250px;
+    /* height: 200px; */
+    background-color: rgba(255, 250, 250,0.1);
+    color:rgba(216, 191, 216,0.5);
+    
+    margin-left: -125px;
+    margin-top: -100px;
+    /* box-shadow: 0 0 0 999px rgba(0,0,0,0.3); */
+    opacity: 1;
+}
+
+#control div {
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 25px;
+    /* border: 1px solid red; */
+}
+#control div i{
+    /* display: block; */
+    position: relative;
+    top: 2px;
+    font-size: 30px;
+    margin-left: -1em;
+    
+}
+#control div span {
+    letter-spacing: 2em;
+    /* margin-left: 1em; */
+}
+#control div:hover {
+    background-color: rgba(255, 250, 250,0.4);
+    /* color:rgba(216, 191, 216,0.9); */
+    color:darkolivegreen;
+    /* border: 2px solid red; */
+}
+
+#control div.pause {
+    display:  none;
+}
+#control div.mousedown {
+    border: 2px inset rgba(255, 250, 250,0.4);
+    box-sizing: border-box;
+}
+
+#gameOverDiv {
+    /* border:1px solid red; */
+    display: none;
+    position: absolute;
+    top: 130px;
+    left:50%;
+    margin-left: -400px;
+    height: 200px;
+    /* height: 60px; */
+    width: 800px;
+    text-align: center;
+    color:darkslategrey;
+    
+}
+
+#gameOverDiv span{
+    font-weight: bolder;
+    text-shadow: 0px 10px 5px rgba(255, 250, 250,0.1),0px 20px 5px rgba(255, 250, 250,0.4);
+    font-size:120px;
+}
+
+#settingDiv {
+    height: 250px;
+    width: 400px;
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    margin-left: -200px;
+    background-color: darkslategray;
+    border-radius: 5px;
+    display: none;
+}
+#settingDiv .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 20px;
+    width: 20px;
+    background-color:orange;
+    border-radius: 0 5px;
+    line-height: 20px;
+    font-size: 20px;
+    font-weight: bolder;
+    color: darkslategray;
+    text-align: center;
+    padding-bottom: 5px;
+    cursor: pointer;
+}
+#settingDiv .close:hover{
+    font-size: 25px;
+    color: wheat;
+}
+#settingDiv .close:active{
+    font-size: 20px;
+}
+#settingDiv form {
+    margin-top: 50px;
+    margin-left: 80px;
+}
+#settingDiv form input{
+    margin-right: 0px;
+    margin-left: 20px;
+}
+#settingDiv form input.foodNum{
+    width: 40px;
+    background-color: rgba(0, 128, 128,0.5);
+    border: 1px solid rgba(216, 191, 216,0.5);
+    margin-left: 100px;
+}
+#settingDiv .btn{
+    text-align: center;
+    width: 70px;
+    height: 25px;
+    background-color: teal;
+    position: absolute;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#settingDiv .btn:hover{
+    font-size: 1.1em;
+    color: wheat;
+}
+#settingDiv .btn:active{
+    font-size: 1em;
+    color: wheat;
+}
+#settingDiv .default{
+    bottom: 20px;
+    left: 220px;
+    width: 75px;
+}
+#settingDiv .confirm{
+    bottom: 20px;
+    left: 310px;
+}
+#settingDiv p {
+    padding: 0 30px;
+    font-size: 0.85em;
+}
+#settingDiv p span{
+    display: block;
+    text-align: right;
+    /* color: red; */
+}

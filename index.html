@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>贪吃蛇</title>
+<script src="js/Polyfill.js" ></script>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/iconfont.css">
+</head>
+<body>
+    <div id="wrap">
+        <div id="map" class="map">      
+        </div>
+        <div id="gameOverDiv">
+            <span>GAME OVER</span>
+            <br>游戏失败，请重新开局！
+            <br>空格：开局/暂停/继续&nbsp;&nbsp;&nbsp;↑↓←→：控制方向
+        </div>
+        <div id="control">
+            <div class="start"> <span>开局</span><i class="iconfont icon-kaiju"></i></div>
+            <div class="pause"> <span>暂停</span><i class="iconfont icon-zanting"></i></div>
+            <div class="setting"> <span>设置</span><i class="iconfont icon-shezhi"></i></div>
+        </div>
+        <div id="settingDiv">
+            <div class="close">x</div>
+            <form action="">
+                <label for="foodNum">食物个数</label>
+                <input type="text" name="foodNum" class="foodNum" value="3" />
+                <br><br>
+                <span>速度</span>
+                <input type="radio" name="speed" value="slow" />
+                <label for="slow">慢</label>
+                <input type="radio" name="speed" value="medium" checked/>
+                <label for="medium">中</label>
+                <input type="radio" name="speed" value="fast" />
+                <label for="fast">快</label>
+            </form>
+            
+            <p>这是我在学习过程中使用原生JS代码编写的贪吃蛇。空格控制开局/暂停/继续,WSAD或↑↓←→控制蛇前进方向。<br><span>by: JasonYang</span></p>
+
+                
+            
+            <div class="btn default">
+                恢复默认
+            </div>
+            <div class="btn confirm">
+                确定
+            </div>
+        </div>
+        
+    </div>
+    
+    <script src="js/common.js"></script>
+    <script src="js/Snake.js"></script>
+    <script src="js/Food.js"></script>
+    <script src="js/Game.js"></script>
+</body>
+</html>
