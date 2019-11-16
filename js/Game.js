@@ -40,7 +40,7 @@
                     this.gameOverDiv.style.display="block";
                     break;
                 case 1:
-                    this.food.generate();
+                    if(Object.keys(foodArea).length<this.foodNum) this.food.generate();
                     break;
                 case 0:
                     break;
@@ -209,7 +209,7 @@
             this.pasue();
         }.bind(this);
         this.btnSetting.onclick = function(){
-            settingDiv.style.display="block";
+            this.settingDiv.style.display="block";
         }.bind(this);
 
         this.settingCloseBtn.onclick = function(){        
@@ -261,8 +261,14 @@
                     break;
 
             }
+            var tmpFoodNum = this.foodNumInput.value - this.foodNum;
+            if(tmpFoodNum>0){
+                for(var i=0;i<tmpFoodNum;i++){
+                this.food.generate();
+                }
+            }
             this.foodNum = parseInt(this.foodNumInput.value);
-            this.style.display="none";
+            this.settingDiv.style.display="none";
         }.bind(this);
 
         }
