@@ -3,7 +3,6 @@
     var map = document.getElementById("map");   
     window.snakeBodyArea = []; // 用来存放蛇身体的区域的坐标
     window.foodArea = {}; //用来存放食物所在区域的坐标以及对应的div元素(用于删除元素)
-    var that = null; //用于存储Game的实例对象
     function Game(map){
         this.map = map;
         this.food = new Food(map);
@@ -13,9 +12,8 @@
         this.controlHiddenTimeId = null;
         this.intervalTime = 150;
         this.foodNum = 3;
-        that = this;
     }
-    Game.prototype.init = function(){
+    Game.prototype.ready = function(){
         this.snake.init();
         this.food.init(this.foodNum);
         this.directionQueue = [];//为了避免某些同学手速过快，解决在蛇的一个move周期内内触发两个键导致假死的bug，决定采用将direction的改变操作改为队列的形式
@@ -33,13 +31,13 @@
                     //挂掉了
                     clearInterval(this.manualPlayTimeId);
                     this.manualPlayTimeId=null;
-                    clearTimeout(game.controlHiddenTimeId);
-                    game.controlHiddenTimeId =  setTimeout(function(){
-                        animate(controlDiv,{"opacity":1});
-                    },1000);
-                    btnPause.style.display="none";
-                    isDead=true;
-                    gameOverDiv.style.display="block";
+                    clearTimeout(this.controlHiddenTimeId);
+                    this.controlHiddenTimeId =  setTimeout(function(){
+                        animate(this.controlDiv,{"opacity":1});
+                    }.bind(this),1000);
+                    this.btnPause.style.display="none";
+                    this.isDead=true;
+                    this.gameOverDiv.style.display="block";
                     break;
                 case 1:
                     this.food.generate();
@@ -47,10 +45,10 @@
                 case 0:
                     break;
             }
-        }.bind(that),this.intervalTime);
+        }.bind(this),this.intervalTime);
     };
     Game.prototype.newGame = function(){
-        game.keyLock = false;
+        this.keyLock = false;
         clearInterval(this.manualPlayTimeId);
         for(var key in foodArea){
             map.removeChild(foodArea[key]);
@@ -70,20 +68,20 @@
             clearInterval(this.manualPlayTimeId);
             this.manualPlayTimeId=null;
             this.keyLock = true;
-            btnPause.innerHTML = '<span>继续</span><i class="iconfont icon-jixu"></i>';
+            this.btnPause.innerHTML = '<span>继续</span><i class="iconfont icon-jixu"></i>';
 
             clearTimeout(this.controlHiddenTimeId);
-            console.log(this.controlHiddenTimeId);
-            animate(controlDiv,{"opacity":1});
+            // console.log(this.controlHiddenTimeId);
+            animate(this.controlDiv,{"opacity":1});
 
         }else{
             this.keyLock = false;
             this.manualPlay();
-            btnPause.innerHTML = '<span>暂停</span><i class="iconfont icon-zanting"></i>';
+            this.btnPause.innerHTML = '<span>暂停</span><i class="iconfont icon-zanting"></i>';
             clearTimeout(this.controlHiddenTimeId);
             this.controlHiddenTimeId = setTimeout(function(){
-                animate(controlDiv,{"opacity":0});
-            },1000);
+                animate(this.controlDiv,{"opacity":0});
+            }.bind(this),1000);
         }
         
     };
@@ -142,29 +140,29 @@
                     }
                     break;
                 case 32:
-                    if(isFirstGame || isDead){
-                        btnStart.click();
-                        btnStart.onmousedown();
+                    if(this.isFirstGame || this.isDead){
+                        this.btnStart.click();
+                        this.btnStart.onmousedown();
                     }else{
-                        btnPause.click();
-                        btnPause.onmousedown();
+                        this.btnPause.click();
+                        this.btnPause.onmousedown();
                     }
                     break;
 
             }
-        }.bind(that);
+        }.bind(this);
         keyUpListener = function(e){
             switch(e.keyCode){
                 case 32:
 
-                        btnStart.onmouseup();
+                        this.btnStart.onmouseup();
 
-                        btnPause.onmouseup();
+                        this.btnPause.onmouseup();
 
                     break;
 
             }
-        }.bind(that);
+        }.bind(this);
         if(document.addEventListener){
             document.addEventListener("keydown",keyListener,false);
             document.addEventListener("keyup",keyUpListener,false);
@@ -173,101 +171,104 @@
             document.attachEvent("onkeyup",keyUpListener)            
         }
     };
+    Game.prototype.init = function(){
+        this.controlDiv = document.getElementById("control");
+        this.btnStart = this.controlDiv.getElementsByClassName("start")[0];
+        this.btnPause = this.controlDiv.getElementsByClassName("pause")[0];
+        this.btnSetting = this.controlDiv.getElementsByClassName("setting")[0];
+        this.gameOverDiv = document.getElementById("gameOverDiv");
+        this.settingDiv = document.getElementById("settingDiv");
+        this.settingCloseBtn =  this.settingDiv.getElementsByClassName("close")[0];
+        this.defaultBtn = this.settingDiv.getElementsByClassName("default")[0];
+        this.confirmBtn = this.settingDiv.getElementsByClassName("confirm")[0];
+        this.foodNumInput = this.settingDiv.getElementsByClassName("foodNum")[0];
+        this.mediumInput = this.settingDiv.querySelector("input[value='medium']");
+    
+        this.isFirstGame = true;
+        this.isDead = false;
+        
+        this.ready();
+        this.btnStart.onclick = function(){
+            if(this.isFirstGame){
+                this.manualPlay();
+                this.isFirstGame=false;
+            }else{
+                this.btnPause.innerHTML = '<span>暂停</span><i class="iconfont icon-zanting"></i>';
+                this.newGame();
+            }
+            //点了开局，过段时间就把controlDiv给隐藏起来
+            clearTimeout(this.controlHiddenTimeId);
+                this.controlHiddenTimeId =  setTimeout(function(){
+                    animate(this.controlDiv,{"opacity":0});
+                }.bind(this),1000);
+            this.isDead=false;
+            this.gameOverDiv.style.display="none";
+            this.btnPause.style.display = "block";
+        }.bind(this);
+        this.btnPause.onclick = function(){
+            this.pasue();
+        }.bind(this);
+        this.btnSetting.onclick = function(){
+            settingDiv.style.display="block";
+        }.bind(this);
 
-    
-    var controlDiv = document.getElementById("control");
-    var btnStart = controlDiv.getElementsByClassName("start")[0];
-    var btnPause = controlDiv.getElementsByClassName("pause")[0];
-    var btnSetting = controlDiv.getElementsByClassName("setting")[0];
-    var gameOverDiv = document.getElementById("gameOverDiv");
-    var settingDiv = document.getElementById("settingDiv");
-    var settingCloseBtn =  settingDiv.getElementsByClassName("close")[0];
-    var defaultBtn = settingDiv.getElementsByClassName("default")[0];
-    var confirmBtn = settingDiv.getElementsByClassName("confirm")[0];
-    var foodNumInput = settingDiv.getElementsByClassName("foodNum")[0];
-    var mediumInput = settingDiv.querySelector("input[value='medium']");
-    
-    
+        this.settingCloseBtn.onclick = function(){        
+            this.settingDiv.style.display="none";
+        }.bind(this);
+        this.btnStart.onmousedown = function(){
+            this.btnStart.className = "start mousedown";
+        }.bind(this);
+        this.btnStart.onmouseup = function(){
+            this.btnStart.className = "start";
+        }.bind(this);
+        this.btnPause.onmousedown = function(){
+            this.btnPause.className = "pause mousedown";
+        }.bind(this);
+        this.btnPause.onmouseup = function(){
+            this.btnPause.className = "pause";
+        }.bind(this);
+        this.btnSetting.onmousedown = function(){
+            this.btnSetting.className = "setting mousedown";
+        }.bind(this);
+        this.btnSetting.onmouseup = function(){
+            this.btnSetting.className = "setting";
+        }.bind(this);
+        this.controlDiv.onmouseover = function(){
+            clearTimeout(this.controlHiddenTimeId);
+            animate(this.controlDiv,{"opacity":1});
+        }.bind(this);
+        this.controlDiv.onmouseout = function(){
+            if(this.manualPlayTimeId != null){
+                clearTimeout(this.controlHiddenTimeId);
+                animate(this.controlDiv,{"opacity":0});
+            }
+        }.bind(this);
+        this.defaultBtn.onclick = function(){
+            this.foodNumInput.value = "3";
+            this.mediumInput.checked="checked";
+        }.bind(this);
+        this.confirmBtn.onclick = function(){
+            var speed = this.settingDiv.querySelector("input[name='speed']:checked").value;
+            switch(speed){
+                case "fast":
+                    this.intervalTime = 80;
+                    break;
+                case "medium":
+                    this.intervalTime = 150;
+                    break;
+                case "slow":
+                    this.intervalTime = 220;
+                    break;
 
-    var isFirstGame = true;
-    var isDead = false;
+            }
+            this.foodNum = parseInt(this.foodNumInput.value);
+            this.style.display="none";
+        }.bind(this);
+
+        }
+
     var game = new Game(map);
     game.init();
-    btnStart.onclick = function(){
-        if(isFirstGame){
-            game.manualPlay();
-            isFirstGame=false;
-        }else{
-            btnPause.innerHTML = '<span>暂停</span><i class="iconfont icon-zanting"></i>';
-            game.newGame();
-        }
-        //点了开局，过段时间就把controlDiv给隐藏起来
-        clearTimeout(game.controlHiddenTimeId);
-        game.controlHiddenTimeId =  setTimeout(function(){
-            animate(controlDiv,{"opacity":0});
-        },1000);
-        isDead=false;
-        gameOverDiv.style.display="none";
-        btnPause.style.display = "block";
-    };
-    btnPause.onclick = function(){
-        game.pasue();
-    };
-    btnSetting.onclick = function(){
-        settingDiv.style.display="block";
-    };
+
     
-    settingCloseBtn.onclick = function(){        
-        settingDiv.style.display="none";
-    };
-    btnStart.onmousedown = function(){
-        this.className = "start mousedown";
-    };
-    btnStart.onmouseup = function(){
-        this.className = "start";
-    };
-    btnPause.onmousedown = function(){
-        this.className = "pause mousedown";
-    };
-    btnPause.onmouseup = function(){
-        this.className = "pause";
-    };
-    btnSetting.onmousedown = function(){
-        this.className = "setting mousedown";
-    };
-    btnSetting.onmouseup = function(){
-        this.className = "setting";
-    };
-    controlDiv.onmouseover = function(){
-        clearTimeout(game.controlHiddenTimeId);
-        animate(controlDiv,{"opacity":1});
-    };
-    controlDiv.onmouseout = function(){
-        if(game.manualPlayTimeId != null){
-            clearTimeout(game.controlHiddenTimeId);
-            animate(controlDiv,{"opacity":0});
-        }
-    };
-    defaultBtn.onclick = function(){
-        foodNumInput.value = "3";
-        mediumInput.checked="checked";
-    }
-    confirmBtn.onclick = function(){
-        var speed = settingDiv.querySelector("input[name='speed']:checked").value;
-        switch(speed){
-            case "fast":
-                game.intervalTime = 80;
-                break;
-            case "medium":
-                game.intervalTime = 150;
-                break;
-            case "slow":
-                game.intervalTime = 220;
-                break;
-
-        }
-        game.foodNum = parseInt(foodNumInput.value);
-        settingDiv.style.display="none";
-    }
-
 }());
