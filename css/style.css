@@ -15,9 +15,9 @@ body {
     position: relative;
     margin: 120px auto;
     height: 400px;
-    /* height: 60px; */
+    /* height: 100px; */
     width: 800px;
-    /* width: 80px; */
+    /* width: 100px; */
     background-color: #CCC;
     background-color:slategrey;
     /* color: orange; */
@@ -27,6 +27,7 @@ body {
     border: 1px solid slategrey;
     box-sizing: border-box;
 }
+
 #control {
     position: absolute;
     top: 50%;

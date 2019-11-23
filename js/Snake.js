@@ -14,7 +14,7 @@
     }
     Snake.prototype.init = function(){
         remove();
-        snakeBodyArea = this.body.map(function(div){return div.x+","+div.y}); 
+        snakeBodyArea = this.body.map(function(div){return [div.x,div.y]}); 
         
         for(var i=0;i<this.body.length;i++){
             div = document.createElement("div");
@@ -32,7 +32,6 @@
         for(var i=this.body.length-1;i>0;i--){
             this.body[i].x = this.body[i-1].x;
             this.body[i].y = this.body[i-1].y;
-            // console.log(this.body[i]);
         }
         var headOffset = [0,0];
         // console.log(this.direction);
@@ -58,30 +57,29 @@
             return -1;
         }
         //如果吃到自己身体
-        if(snakeBodyArea.indexOf(xPost +","+yPost)>=0){
+        if(snakeBodyArea.containCoor([xPost,yPost])){
             return -1;
         }
         //如果没有遇到致命危险就改变自己的坐标
         this.body[0].x = xPost
         this.body[0].y = yPost
         
-        //如果吃到食物
+        
 
-        remove()        
+        remove()    
         this.init();
 
-        if(Object.keys(foodArea).indexOf(xPost +","+yPost)>=0){
+        //如果吃到食物
+        
+        if(foodArea.containCoor( [xPost,yPost]) ){
 
             var last = this.body[this.body.length-1]
             this.body.push({"x": last.x,"y": last.y,"color": last.color});
-            map.removeChild(foodArea[xPost+","+yPost])
-            delete foodArea[xPost+","+yPost]
+            var foodDiv = map.getElementsByClassName(xPost+"_"+yPost)[0];
+            map.removeChild(foodDiv)
+            foodArea.removeCoor([xPost,yPost]);
             return 1;
-            
-            
 
-            // console.log(this.body);
-            // console.log("========");
         }
 
         return 0;

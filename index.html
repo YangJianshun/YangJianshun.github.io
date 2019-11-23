@@ -9,17 +9,18 @@
 </head>
 <body>
     <div id="wrap">
-        <div id="map" class="map">      
+        <div id="map" class="map">
         </div>
         <div id="gameOverDiv">
             <span>GAME OVER</span>
             <br>游戏失败，请重新开局！
             <br>空格：开局/暂停/继续&nbsp;&nbsp;&nbsp;↑↓←→：控制方向
-            <br> 2019.11.06更新说明：<br>进一步封装代码；设置食物当局生效(已经出现的食物不会被删除，除非吃掉它)。
+            <br> 2019.11.23更新说明：<br>添加托管模式
         </div>
         <div id="control">
             <div class="start"> <span>开局</span><i class="iconfont icon-kaiju"></i></div>
             <div class="pause"> <span>暂停</span><i class="iconfont icon-zanting"></i></div>
+            <div class="auto"> <span>托管</span><i class="iconfont icon-zidong"></i></div>
             <div class="setting"> <span>设置</span><i class="iconfont icon-shezhi"></i></div>
         </div>
         <div id="settingDiv">
@@ -54,6 +55,7 @@
     <script src="js/common.js"></script>
     <script src="js/Snake.js"></script>
     <script src="js/Food.js"></script>
+    <script src="js/AutoEat.js"></script>
     <script src="js/Game.js"></script>
 
 </body>

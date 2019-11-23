@@ -8,7 +8,7 @@
         this.color = color||"green";    
     }
     function remove(){
-        foodArea={};
+        foodArea.length=0;
     }
     Food.prototype.init = function(foodNum){
         remove();
@@ -22,7 +22,8 @@
         do{
             this.x = Math.floor(Math.random()*map.offsetWidth/this.width) 
             this.y = Math.floor(Math.random()*map.offsetHeight/this.height)
-        }while(snakeBodyArea.indexOf(this.x +","+this.y)>=0 || Object.keys(foodArea).indexOf(this.x +","+this.y)>=0)
+        }while(snakeBodyArea.containCoor([this.x,this.y]) || foodArea.containCoor([this.x ,this.y]) )
+        
         div = document.createElement("div");
         div.style.width = this.width + "px";
         div.style.height = this.height + "px";
@@ -31,10 +32,10 @@
 
         div.style.backgroundColor = this.color;
         div.style.position = "absolute";
-
+        div.className="food "+this.x+"_"+this.y;
         map.appendChild(div);
-        foodArea[this.x+","+this.y] = div;
-
+        
+        foodArea.push([this.x,this.y]);
     }
     window.Food = Food;
     // var food = new Food(map);
