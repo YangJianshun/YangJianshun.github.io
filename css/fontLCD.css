@@ -1,0 +1,6 @@
+@font-face {
+    font-family: led;
+    src:url('led.ttf'),
+    url('led.eot');
+    /* url('led.woff2'); */
+}

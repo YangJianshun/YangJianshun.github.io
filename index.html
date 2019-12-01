@@ -4,26 +4,57 @@
 <meta charset="UTF-8">
 <title>贪吃蛇</title>
 <script src="js/Polyfill.js" ></script>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/fontLCD.css">
 <link rel="stylesheet" href="css/iconfont.css">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div id="wrap">
+        <div id="rankBoard">
+                <div class="left"></div>
+                <div class="trigger-right"><div class="right"></div></div>
+                <h3>英雄榜</h3>
+                <ol><li><span>排名</span><span>分数</span><span>玩家</span></li></ol>
+                <ul>
+                    <li><span>1</span><span>1234</span><span>游客</span></li>
+                    <li><span>2</span><span>1200</span><span>小明</span></li>
+                    <li><span>3</span><span>668</span><span>游客</span></li>
+                </ul>
+        </div>
+
+        <div id="scoreBoard">
+            <div class="dropDown"></div>
+            <div class="trigger-up"><div class="pullUp"></div></div>
+            <span>0</span>
+            <span>0</span>
+            <span>0</span>
+            <span>0</span>
+            <span>0</span>
+            <span>0</span>
+        </div>
+
         <div id="map" class="map">
         </div>
         <div id="gameOverDiv">
             <span>GAME OVER</span>
             <br>游戏失败，请重新开局！
             <br>空格：开局/暂停/继续&nbsp;&nbsp;&nbsp;↑↓←→：控制方向
-            <br> 2019.11.23更新说明：<br>添加托管模式
+            <br> 2019.12.01更新说明：<br>(1)增加记分牌;(2)增加英雄榜;(3)设置信息及英雄榜的本地存储(暂不支持IE);(4)细节优化
+            <br>除本地存储外，其余功能兼容谷歌、火狐、IE9+
         </div>
+        <div id="hostingModeDiv" class="normal">
+            <span class="still">A</span><i class="iconfont icon-zidong spin"></i>&nbsp;托管模式开启
+        </div>
+        
+        
         <div id="control">
             <div class="start"> <span>开局</span><i class="iconfont icon-kaiju"></i></div>
             <div class="pause"> <span>暂停</span><i class="iconfont icon-zanting"></i></div>
             <div class="auto"> <span>托管</span><i class="iconfont icon-zidong"></i></div>
+            <div class="save"> <span class=" fourWords">保存战绩&nbsp;&nbsp;</span><i class="iconfont icon-baocun"></i></div>
             <div class="setting"> <span>设置</span><i class="iconfont icon-shezhi"></i></div>
         </div>
-        <div id="settingDiv">
+        <div id="settingDiv" class="modal">
             <div class="close">x</div>
             <form action="">
                 <label for="foodNum">食物个数</label>
@@ -49,6 +80,20 @@
                 确定
             </div>
         </div>
+        <div id="saveDiv" class="modal">
+            <div class="close">x</div>
+            <br><br>
+            <label for="playerName">请保存您的战绩</label>
+            <br>
+            <input type="text" name="playerName" class="playerName" placeholder="游客"/> <span class="score">0</span>
+            <div class="btn cancel">
+                取消
+            </div>
+            <div class="btn saveData">
+                保存
+            </div>
+        </div>
+        
         
     </div>
     

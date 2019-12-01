@@ -20,7 +20,6 @@ body {
     /* width: 100px; */
     background-color: #CCC;
     background-color:slategrey;
-    /* color: orange; */
 }
 #map div{
     border-radius: 5px ;              
@@ -59,8 +58,12 @@ body {
     margin-left: -1em;
     
 }
-#control div span {
+#control div span {    
     letter-spacing: 2em;
+    /* margin-left: 1em; */
+}
+#control div span.fourWords {    
+    letter-spacing: 0.25em;
     /* margin-left: 1em; */
 }
 #control div:hover {
@@ -71,6 +74,9 @@ body {
 }
 
 #control div.pause {
+    display:  none;
+}
+#control div.save {
     display:  none;
 }
 #control div.mousedown {
@@ -98,19 +104,18 @@ body {
     text-shadow: 0px 10px 5px rgba(255, 250, 250,0.1),0px 20px 5px rgba(255, 250, 250,0.4);
     font-size:120px;
 }
-
-#settingDiv {
-    height: 250px;
-    width: 400px;
+.modal {
     position: absolute;
     top: 100px;
     left: 50%;
-    margin-left: -200px;
     background-color: darkslategray;
     border-radius: 5px;
     display: none;
+    height: 200px;
+    width: 200px;
 }
-#settingDiv .close {
+
+.modal .close {
     position: absolute;
     top: 0;
     right: 0;
@@ -126,28 +131,22 @@ body {
     padding-bottom: 5px;
     cursor: pointer;
 }
-#settingDiv .close:hover{
+.modal .close:hover{
     font-size: 25px;
     color: wheat;
 }
-#settingDiv .close:active{
+.modal .close:active{
     font-size: 20px;
 }
-#settingDiv form {
+.modal form {
     margin-top: 50px;
     margin-left: 80px;
 }
-#settingDiv form input{
+.modal form input{
     margin-right: 0px;
     margin-left: 20px;
 }
-#settingDiv form input.foodNum{
-    width: 40px;
-    background-color: rgba(0, 128, 128,0.5);
-    border: 1px solid rgba(216, 191, 216,0.5);
-    margin-left: 100px;
-}
-#settingDiv .btn{
+.modal .btn{
     text-align: center;
     width: 70px;
     height: 25px;
@@ -156,29 +155,290 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
-#settingDiv .btn:hover{
+.modal .btn:hover{
     font-size: 1.1em;
     color: wheat;
 }
-#settingDiv .btn:active{
+.modal .btn:active{
     font-size: 1em;
     color: wheat;
 }
-#settingDiv .default{
+#settingDiv.modal {
+    height: 250px;
+    width: 400px;
+    margin-left: -200px;
+    background-color: darkslategray;
+    border-radius: 5px;
+    /* display: none;  */
+}
+#settingDiv.modal form input.foodNum{
+    width: 40px;
+    background-color: rgba(0, 128, 128,0.5);
+    border: 1px solid rgba(216, 191, 216,0.5);
+    margin-left: 100px;
+}
+#settingDiv.modal .default{
     bottom: 20px;
     left: 220px;
     width: 75px;
 }
-#settingDiv .confirm{
+#settingDiv.modal .confirm{
     bottom: 20px;
     left: 310px;
 }
-#settingDiv p {
+#settingDiv.modal p {
     padding: 0 30px;
     font-size: 0.85em;
 }
-#settingDiv p span{
+#settingDiv.modal p span{
     display: block;
     text-align: right;
     /* color: red; */
+}
+#saveDiv.modal {
+    width:250px;
+    margin-left: -125px;
+}
+#saveDiv.modal input,label{
+    margin:20px 0 0 20px;
+    width:80px;
+}
+#saveDiv.modal .cancel{
+    bottom: 20px;
+    right: 100px;
+}
+#saveDiv.modal .saveData{
+    bottom: 20px;
+    right: 20px;
+}
+#saveDiv.modal span.score{
+    /* display: inline-block; */
+    position: relative;
+    top: 8px;
+    left: 10px;
+    font-size: 2em;
+}
+#hostingModeDiv {
+    position: absolute;
+    height: 20px;
+    line-height: 20px;
+    /* border: 1px solid red; */
+    top: 10px;
+    right: 50%;
+    margin-right:-390px;
+    color: aquamarine;
+    opacity: 0.5;
+    cursor: pointer;
+}
+#hostingModeDiv i{
+    display: inline-block;
+    font-size: 1.2em;
+    position: relative;
+}
+
+
+#hostingModeDiv.normal {
+    animation:divMove 1s infinite;
+    display: none;
+}
+#hostingModeDiv.normal span.still{
+    position: relative;
+    z-index: 10;
+    font-size: 11px;
+    left: 16.5px;
+    top: -1.8px;
+    height: 10px;
+    line-height: 10px;
+    width: 9px;
+    border: 1px solid slategrey;
+    border-left: 2px solid slategrey;
+    border-right: 2px solid slategrey;
+    
+    display: inline-block;
+    border-radius: 10px;
+    background-color:slategrey;
+
+    
+    /* margin-right:-390px; */
+    
+}
+#hostingModeDiv.normal i.spin{
+    /* transform:rotate(135deg); */
+    animation:iMove 3s infinite;
+    top: 0.5px;
+}
+
+@keyframes divMove
+{
+0% {opacity: 0.5;}
+50% {opacity: 0.8;}
+100% {opacity: 0.5;}
+}
+@keyframes iMove
+{
+0% {transform:rotate(0deg);}
+50% {transform:rotate(-360deg);}
+50% {transform:rotate(0deg);}
+100% {transform:rotate(-360deg);}
+}
+
+#hostingModeDiv.mouseover {
+    opacity: 0.8;
+}
+#hostingModeDiv.mouseover i{
+    top: 1.5px;
+}
+#scoreBoard {
+    position: absolute;
+    /* border:1px solid red; */
+    background-color: darkslategray;
+    height: 40px;
+    width: 155px;
+    top: 0px;
+    right: 50%;
+    margin-right: -400px;
+    padding: 0;
+}
+
+
+#scoreBoard span{
+    margin: 5px 0 0 5px;
+    /* display: block; */
+    float: left;
+    background-color: slategray;
+    height: 30px;
+    line-height: 30px;
+    width: 20px;
+    font-family: led;
+    font-size: 42px;
+}
+
+#scoreBoard div.dropDown {
+    position: absolute;
+    height: 0px;
+    width: 0px;
+    border-top: 5px solid orange;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid transparent;
+    top:0;
+    left: 50%;
+    margin-left: -2.5px;
+    display: none;
+    cursor: pointer;
+}
+#scoreBoard div.pullUp {
+    position: absolute;
+    height: 0px;
+    width: 0px;
+    border-top: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid orange;
+    border-left: 5px solid transparent;
+    top:-8px;
+    left: 50%;
+    margin-left: -2.5px;
+    /* display: none; */
+    transition: opacity 0.3s;
+}
+
+#scoreBoard div.trigger-up {
+    position: absolute;
+    height: 5px;
+    width: 155px;
+    /* background-color: orange; */
+    border-bottom: 3px solid darkslategray;
+    box-sizing: border-box;
+    top: -5px;
+    opacity: 0;
+    cursor: pointer;
+    
+}
+
+#scoreBoard div.trigger-up:hover{
+    opacity: 1;
+}
+
+#rankBoard {
+    position: absolute;
+    /* border:1px solid red; */
+    background-color: darkslategray;
+    height: 90px;
+    width: 200px;
+    top: 0px;
+    right: 50%;
+    /* margin-right: -600px; */
+    margin-right: -400px;
+    padding: 0;
+}
+#rankBoard .left {
+    position: absolute;
+    height: 0px;
+    width: 0px;
+    /* background-color: orange; */
+    border-top: 10px solid transparent;
+    border-right: 10px solid orange;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid transparent;
+    top: 50%;
+    right: 0;
+    margin-top: -5px;
+    display: none;
+    cursor: pointer;
+}
+#rankBoard div.trigger-right {
+    position: absolute;
+    height: 200px;
+    width: 5px;
+    /* background-color: orange; */
+    /* border-bottom: 3px solid darkslategray; */
+    border-right: 3px solid darkslategray;
+    right: -3px;
+    /* box-sizing: border-box; */
+    
+    opacity: 0;
+    cursor: pointer;
+    
+}
+
+#rankBoard div.trigger-right:hover{
+    opacity: 1;
+}
+
+#rankBoard div.right {
+    position: absolute;
+    height: 0px;
+    width: 0px;
+    border-top: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid orange;
+    top: 50%;
+    left: 8px;
+    margin-top: -5px;
+    /* display: none; */
+    transition: opacity 0.3s;
+}
+#rankBoard h3{
+    text-align: center;
+}
+#rankBoard ol,ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#rankBoard li {
+    border-bottom: 1px dashed grey;
+}
+#rankBoard span {
+    display: inline-block;
+    margin: 0 0 5px 5px;
+    width: 55px;
+    height: 20px;
+    text-align: right;
+    /* border: 1px solid red; */
+}
+
+#rankBoard ul li:nth-child(even){
+    /* background-color: grey; */
 }

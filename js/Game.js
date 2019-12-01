@@ -10,22 +10,52 @@
         this.keyLock = false;
         this.playTimeId = null;
         this.controlHiddenTimeId = null;
-        this.intervalTime = 150;
-        this.autoTime = 5;
-        this.foodNum = 3;
         this.mode = "manual";
         this.mapHeight = this.map.offsetHeight/this.snake.height;
         this.mapWidth = this.map.offsetWidth/this.snake.width;
         this.autoBehavior = [];
+        this.score = 0;
+        this.rank = [];
     }
     Game.prototype.ready = function(){
+        var snakeSettingItem=null;
+        if(localStorage){   
+            snakeSettingItem = localStorage.getItem("snakeSettingItem");
+        }
+        //MARK IE 兼容
+        if(snakeSettingItem===null){
+            this.intervalTime = 150;        
+            this.foodNum = 3;
+        }else{
+            snakeSettingItem=JSON.parse(snakeSettingItem);
+            this.intervalTime = snakeSettingItem.intervalTime;        
+            this.foodNum = snakeSettingItem.foodNum;
+            this.settingDiv.querySelector("input[name='speed'][value='slow']").checked=false;
+            this.settingDiv.querySelector("input[name='speed'][value='medium']").checked=false;
+            this.settingDiv.querySelector("input[name='speed'][value='fast']").checked=false;
+
+            if(snakeSettingItem.intervalTime===220){
+                this.settingDiv.querySelector("input[name='speed'][value='slow']").checked=true;
+            }else if(snakeSettingItem.intervalTime===150){
+                this.settingDiv.querySelector("input[name='speed'][value='medium']").checked=true;
+            }else if(snakeSettingItem.intervalTime===80){
+                this.settingDiv.querySelector("input[name='speed'][value='fast']").checked=true;
+            }
+            this.foodNumInput.value = snakeSettingItem.foodNum;
+
+        }
+
         this.snake.init();
         this.food.init(this.foodNum);
         this.directionQueue = [];//为了避免某些同学手速过快，解决在蛇的一个move周期内内触发两个键导致假死的bug，决定采用将direction的改变操作改为队列的形式
         this.bindKey();
     };
+   
     Game.prototype.play = function(){
-        
+        this.status="moving";
+        this.scoreBoardPullUp.style.display="none";
+        animate(this.scoreBoard,{"top":-40});
+        this.btnSave.style.display="none";
         this.playTimeId = setInterval(function(){
             var moveState;
             if(this.mode == "manual"){
@@ -98,9 +128,13 @@
                     this.btnPause.style.display="none";
                     this.isDead=true;
                     this.gameOverDiv.style.display="block";
+                    this.btnSave.style.display="block";
+                    this.status="stopping";
                     break;
                 case 1:
                     if(foodArea.length<this.foodNum) this.food.generate();
+                    this.score++;
+                    this.loadScore();
                     break;
                 case 0:
                     break;
@@ -114,7 +148,6 @@
         this.autoBehavior.length=0;
         
         var foodDivLst = map.getElementsByClassName("food");
-        
         while(foodDivLst.length > 0){
             map.removeChild(foodDivLst[0]);
         }
@@ -135,7 +168,7 @@
             this.playTimeId=null;
             this.keyLock = true;
             this.btnPause.innerHTML = '<span>继续</span><i class="iconfont icon-jixu"></i>';
-
+            this.status = "stopping";
             clearTimeout(this.controlHiddenTimeId);
             animate(this.controlDiv,{"opacity":1});
 
@@ -147,10 +180,46 @@
             this.controlHiddenTimeId = setTimeout(function(){
                 animate(this.controlDiv,{"opacity":0});
             }.bind(this),1000);
+            this.status = "moving";
         }
         
     };
-    
+    Game.prototype.loadScore = function(){
+        var spanDivLst = this.scoreBoard.getElementsByTagName("span");
+        var nums = this.score.toString().padStart(6,"0").split("");
+        nums = nums.splice(-6);
+        for(var i=0;i<=5;i++){
+            spanDivLst[i].innerHTML=nums[i];
+        }
+        
+    };
+    Game.prototype.loadRank = function(){
+        //MARK 加载英雄榜
+        if(localStorage){
+            this.rank=localStorage.getItem("rank");
+            if(this.rank==null){
+                this.rank=[];
+            }else{
+                this.rank = JSON.parse(this.rank);
+            }
+        }
+        //排序后加载到ul中
+        function sortRank(a,b){
+        return b.score - a.score;
+        }
+        this.rank.sort(sortRank);
+        var showRank = this.rank;
+        if(showRank.length>10){
+            showRank.splice(10);
+        }
+        this.rankBoard.style.height = 90+26*showRank.length+5+"px";
+        this.rankBoardRight.style.height = 90+26*showRank.length+5+"px";
+        var ulObj = this.rankBoard.getElementsByTagName("ul")[0];
+        ulObj.innerHTML="";
+        for(var i=0;i<showRank.length;i++){
+            ulObj.innerHTML += "<li><span>"+(i+1)+"</span><span>"+showRank[i].score+"</span><span>"+showRank[i].playerName+"</span></li>";
+        }
+    };
     Game.prototype.bindKey = function(){
 
         keyListener = function(e){
@@ -241,20 +310,36 @@
         this.btnStart = this.controlDiv.getElementsByClassName("start")[0];
         this.btnPause = this.controlDiv.getElementsByClassName("pause")[0];
         this.btnAuto = this.controlDiv.getElementsByClassName("auto")[0];
+        this.btnSave= this.controlDiv.getElementsByClassName("save")[0];
         this.btnSetting = this.controlDiv.getElementsByClassName("setting")[0];
         this.gameOverDiv = document.getElementById("gameOverDiv");
+        this.saveDiv = document.getElementById("saveDiv");
+        this.saveCloseBtn = this.saveDiv.getElementsByClassName("close")[0];
+        this.cancelBtn = this.saveDiv.getElementsByClassName("cancel")[0];
+        this.saveBtn = this.saveDiv.getElementsByClassName("saveData")[0];
         this.settingDiv = document.getElementById("settingDiv");
         this.settingCloseBtn =  this.settingDiv.getElementsByClassName("close")[0];
         this.defaultBtn = this.settingDiv.getElementsByClassName("default")[0];
         this.confirmBtn = this.settingDiv.getElementsByClassName("confirm")[0];
         this.foodNumInput = this.settingDiv.getElementsByClassName("foodNum")[0];
         this.mediumInput = this.settingDiv.querySelector("input[value='medium']");
-    
+        this.hostingModeDiv = document.getElementById("hostingModeDiv");
+        this.scoreBoard = document.getElementById("scoreBoard");
+        this.scoreBoardDropDown = this.scoreBoard.getElementsByTagName("div")[0];
+        this.scoreBoardPullUp = this.scoreBoard.getElementsByTagName("div")[1];
+        this.rankBoard = document.getElementById("rankBoard");
+        this.rankBoardLeft = this.rankBoard.getElementsByTagName("div")[0];
+        this.rankBoardRight = this.rankBoard.getElementsByTagName("div")[1];
+
+        this.status="stopping";
         this.isFirstGame = true;
         this.isDead = false;
         
         this.ready();
+        this.loadRank();
         this.btnStart.onclick = function(){
+            this.score=0;
+            this.loadScore();
             if(this.isFirstGame){
                 this.play();
                 this.isFirstGame=false;
@@ -276,35 +361,79 @@
         }.bind(this);
 
         this.btnAuto.onclick = function(){
-            if(this.btnAuto.innerHTML.indexOf("托管")!=-1){
-                this.btnAuto.innerHTML = '<span>手动</span><i class="iconfont icon-shoudong"></i>';
+            if(this.btnAuto.innerHTML.indexOf("<span>托管</span>")!=-1){
+                this.btnAuto.innerHTML = '<span class="fourWords">取消托管&nbsp;&nbsp;</span><i class="iconfont icon-quxiao"></i>';
                 this.mode = "auto";
 
-                this.intervalTime = this.autoTime;
+                this.intervalTime = this.intervalTime;
                 if(this.playTimeId){
                     clearInterval(this.playTimeId);
                     this.playTimeId=null;
                     this.play();
                 }
+                this.hostingModeDiv.style.display="block";
             }else{
                 this.btnAuto.innerHTML = '<span>托管</span><i class="iconfont icon-zidong"></i>';
                 this.mode = "manual";
                 this.autoBehavior.length=0;
-                this.confirmBtn.click();
+                // this.confirmBtn.click();
                 if(this.playTimeId){
                     clearInterval(this.playTimeId);
                     this.playTimeId=null;
                     this.play();
                 }
+                this.hostingModeDiv.style.display="none";
             }
             
         }.bind(this);
+
+        this.btnSave.onclick = function(){
+            this.saveDiv.style.display = "block";
+            this.btnSave.style.display="none";
+            var span = this.saveDiv.getElementsByClassName("score")[0];
+            var spanHtml = this.score.toString().padStart(6," ");
+            spanHtml = spanHtml.replace(/ /g,"&nbsp;")
+            span.innerHTML = spanHtml;
+        }.bind(this);
+        this.saveCloseBtn.onclick = function(){
+            this.saveDiv.style.display = "none";
+        }.bind(this);
+        this.cancelBtn.onclick = function(){
+            this.saveDiv.style.display = "none";
+        }.bind(this);
+        this.saveBtn.onclick = function(){
+            this.saveDiv.style.display = "none";
+            var playerName = this.saveDiv.getElementsByTagName("input")[0].value;
+            if(playerName===""){playerName="游客";}
+            var rankTmp = null;
+            if(localStorage){
+                rankTmp = localStorage.getItem("rank");
+            }
+            if(rankTmp===null){
+                rankTmp = [];
+            }else{
+                rankTmp = JSON.parse(rankTmp);
+            }
+            rankTmp.push({playerName: playerName, score: this.score});
+            if(localStorage){
+                localStorage.setItem("rank",JSON.stringify(rankTmp));
+            }else{
+                this.rank.push({playerName: playerName, score: this.score});
+            }
+            this.loadRank();
+            this.rankBoardRight.onclick();
+        }.bind(this);
         this.btnSetting.onclick = function(){
             this.settingDiv.style.display="block";
+            clearInterval(this.playTimeId);
         }.bind(this);
 
         this.settingCloseBtn.onclick = function(){        
             this.settingDiv.style.display="none";
+            if(this.status==="moving"){
+                clearInterval(this.playTimeId);
+                this.play();
+            }
         }.bind(this);
         this.btnStart.onmousedown = function(){
             this.btnStart.className = "start mousedown";
@@ -317,7 +446,9 @@
         this.btnAuto.onmousedown = function(){
             this.btnAuto.className = "auto mousedown";
         }.bind(this);
-
+        this.btnSave.onmousedown = function(){
+            this.btnSave.className = "save mousedown";
+        }.bind(this);
         this.btnSetting.onmousedown = function(){
             this.btnSetting.className = "setting mousedown";
         }.bind(this);
@@ -325,6 +456,7 @@
         document.onmouseup = function(){
             this.btnStart.className = "start";
             this.btnPause.className = "pause";
+            this.btnSave.className = "save";
             this.btnSetting.className = "setting";
             this.btnAuto.className = "auto";
         }.bind(this);
@@ -341,6 +473,14 @@
         this.defaultBtn.onclick = function(){
             this.foodNumInput.value = "3";
             this.mediumInput.checked="checked";
+        }.bind(this);
+        this.foodNumInput.onchange = function(){
+            if(parseInt(this.foodNumInput.value)>500){
+                this.foodNumInput.value=500;
+            }
+            if(parseInt(this.foodNumInput.value)<=0){
+                this.foodNumInput.value=1;
+            }
         }.bind(this);
         this.confirmBtn.onclick = function(){
             var speed = this.settingDiv.querySelector("input[name='speed']:checked").value;
@@ -363,9 +503,58 @@
                 }
             }
             this.foodNum = parseInt(this.foodNumInput.value);
+            var snakeSettingItem = {foodNum:this.foodNum, intervalTime:this.intervalTime};
+            if(localStorage){
+                localStorage.setItem("snakeSettingItem",JSON.stringify(snakeSettingItem));
+            }
             this.settingDiv.style.display="none";
+            if(this.status==="moving"){
+                clearInterval(this.playTimeId);
+                this.play();
+            }
         }.bind(this);
-
+        this.hostingModeDiv.onmouseenter = function(){
+            this.hostingModeDiv.innerHTML="<i class='iconfont icon-quxiao'></i>&nbsp;关闭托管模式";
+            this.hostingModeDiv.className="mouseover";
+        }.bind(this);
+        this.hostingModeDiv.onmouseleave = function(){
+            this.hostingModeDiv.innerHTML="<span class='still'>A</span><i class='iconfont icon-zidong spin'></i>&nbsp;托管模式开启";
+            this.hostingModeDiv.className="normal";
+        }.bind(this);
+        this.hostingModeDiv.onclick = function(){
+            this.btnAuto.onclick();
+        }.bind(this);
+        this.scoreBoard.onmouseenter = function(){
+            this.scoreBoardDropDown.style.display="block";
+        }.bind(this);
+        this.scoreBoard.onmouseleave = function(){
+            this.scoreBoardDropDown.style.display="none";
+        }.bind(this);
+        this.scoreBoardDropDown.onclick = function(){
+            animate(this.scoreBoard,{"top":0},function(){
+                this.scoreBoardPullUp.style.display="block";
+            }.bind(this));
+        }.bind(this);
+        this.scoreBoardPullUp.onclick = function(){
+            this.scoreBoardPullUp.style.display="none";
+            animate(this.scoreBoard,{"top":-40});
+        }.bind(this);
+        this.rankBoard.onmouseenter = function(){
+            this.rankBoardLeft.style.display="block";
+        }.bind(this);
+        this.rankBoard.onmouseleave = function(){
+            this.rankBoardLeft.style.display="none";
+        }.bind(this);
+        this.rankBoardLeft.onclick = function(){
+            animate(this.rankBoard,{"margin-right":-400},function(){
+                this.rankBoardRight.style.display = "block";
+            }.bind(this));
+        }.bind(this);
+        this.rankBoardRight.onclick = function(){
+            this.rankBoardRight.style.display="none";
+            animate(this.rankBoard,{"margin-right":-600});
+            this.loadRank();
+        }.bind(this);
     };
 
     var game = new Game(map);
@@ -376,5 +565,6 @@
     // var path = getPathByBFS(start,endLst,4,4,[[0,1],[1,2],[2,2]]);
     // var behavior = path2behavior(path);
     // console.log(behavior);
-    
+    // game.score = 128;
+    // game.loadScore();
 }());
