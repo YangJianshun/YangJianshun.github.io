@@ -200,7 +200,7 @@ body {
     margin-left: -125px;
 }
 #saveDiv.modal input,label{
-    margin:20px 0 0 20px;
+    margin:20px 0 0 5px;
     width:80px;
 }
 #saveDiv.modal .cancel{

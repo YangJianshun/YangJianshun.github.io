@@ -33,6 +33,7 @@
             this.settingDiv.querySelector("input[name='speed'][value='slow']").checked=false;
             this.settingDiv.querySelector("input[name='speed'][value='medium']").checked=false;
             this.settingDiv.querySelector("input[name='speed'][value='fast']").checked=false;
+            this.settingDiv.querySelector("input[name='speed'][value='veryFast']").checked=false;
 
             if(snakeSettingItem.intervalTime===220){
                 this.settingDiv.querySelector("input[name='speed'][value='slow']").checked=true;
@@ -40,6 +41,8 @@
                 this.settingDiv.querySelector("input[name='speed'][value='medium']").checked=true;
             }else if(snakeSettingItem.intervalTime===80){
                 this.settingDiv.querySelector("input[name='speed'][value='fast']").checked=true;
+            }else if(snakeSettingItem.intervalTime===5){
+                this.settingDiv.querySelector("input[name='speed'][value='veryFast']").checked=true;
             }
             this.foodNumInput.value = snakeSettingItem.foodNum;
 
@@ -52,10 +55,12 @@
     };
    
     Game.prototype.play = function(){
+        var stepNum = 0;
         this.status="moving";
         this.scoreBoardPullUp.style.display="none";
         animate(this.scoreBoard,{"top":-40});
         this.btnSave.style.display="none";
+        var offsetLst = [[0,-1],[0,1],[-1,0],[1,0]];
         this.playTimeId = setInterval(function(){
             var moveState;
             if(this.mode == "manual"){
@@ -64,18 +69,35 @@
                 }
                 moveState = this.snake.move();
             }else if(this.mode == "auto"){
-                    
+                    if(this.score>=795){this.btnPause.click();this.btnAuto.click();}//吃到这里，程序不知道怎么走，会陷入程序的死循环，因此，暂停并取消托管模式
                     var snakeHeadCoor = snakeBodyArea[0];
                     var snakeTailCoor = snakeBodyArea[snakeBodyArea.length-1];
                     
                     var path = getPathByBFS(snakeHeadCoor,foodArea,this.mapWidth,this.mapHeight,obstacle=snakeBodyArea);
                    
                     
-                    //吃不到，或者吃完过后找不到尾巴,就先绕着走，但是绕到的那个点必须能找到尾巴
-                    if( path.length==0 || (! catchUpTail(path,snakeBodyArea,this.mapWidth,this.mapHeight)) ){
-                        
+                    //或吃不到，或者吃完过后找不到尾巴,就先绕着走，但是绕到的那个点必须能找到尾巴
+                    
+                    var around=false;
+                    if(path.length==0 || (! catchUpTail(path,snakeBodyArea,this.mapWidth,this.mapHeight)) ){around=true;}
+                    else if(snakeBodyArea.length>550 && path.length>1){around=true;}
+                    else if(snakeBodyArea.length>400 && path.length>7){around=true;}
+                    else if(snakeBodyArea.length>300 && path.length>10){around=true;}
+                    else if(snakeBodyArea.length>200 && path.length>15){around=true;}
+                    else if(snakeBodyArea.length>50 && path.length>25){around=true;}
+                    
+                    
+                    
+                    
+                    if(stepNum>800){//陷入死循环
+                        stepNum=0;
+                        // offsetLst = [[0,-1],[0,1],[-1,0],[1,0]];
+                        offsetLst = [offsetLst[2],offsetLst[3],offsetLst[0],offsetLst[1]];
+                    }
+
+                    if(around){                        
                         var nextCoor;
-                        var offsetLst = [[0,-1],[0,1],[-1,0],[1,0]];
+                        
                         var distanceNextCoor=-1;
                         for(var i=0;i<offsetLst.length;i++){
                             offset = offsetLst[i];
@@ -84,7 +106,12 @@
                             // 到了这个格子后，还能找到自己的尾巴 也就是说，找不到自己尾巴的pass掉
                             if(!catchUpTail([snakeHeadCoor,nextCoorTmp],snakeBodyArea,this.mapWidth,this.mapHeight)){continue;}
                             //找离食物距离最远的格子
-                            var pathTmp = getPathByBFS(nextCoorTmp,foodArea,this.mapWidth,this.mapHeight,obstacle=[nextCoorTmp].concat(snakeBodyArea.slice(0,snakeBodyArea.length-1)));
+                            // var pathTmp = getPathByBFS(nextCoorTmp,foodArea,this.mapWidth,this.mapHeight,obstacle=[nextCoorTmp].concat(snakeBodyArea.slice(0,snakeBodyArea.length-1)));
+                            //找距离蛇尾最远的格子
+                            var pathTmp = getPathByBFS(nextCoorTmp,[snakeBodyArea[snakeBodyArea.length-1]],this.mapWidth,this.mapHeight,obstacle=[nextCoorTmp].concat(snakeBodyArea.slice(0,snakeBodyArea.length-1)));
+                            // var pathTmp = getPathByBFS(nextCoorTmp,snakeBodyArea.slice(-3),this.mapWidth,this.mapHeight,obstacle=[nextCoorTmp].concat(snakeBodyArea.slice(0,snakeBodyArea.length-1)));
+                           
+                            
                             // console.log(pathTmp.length);
                             if(pathTmp.length>distanceNextCoor){
                                 distanceNextCoor=pathTmp.length;
@@ -115,7 +142,7 @@
                 
                 
             }
-            
+            stepNum+=1;
             switch(moveState){
                 case -1:
                     //挂掉了
@@ -132,6 +159,7 @@
                     this.status="stopping";
                     break;
                 case 1:
+                    stepNum=0;
                     if(foodArea.length<this.foodNum) this.food.generate();
                     this.score++;
                     this.loadScore();
@@ -139,7 +167,8 @@
                 case 0:
                     break;
             }
-        }.bind(this),this.intervalTime);
+        }.bind(this),this.intervalTime);//MARK1
+        // }.bind(this),2);
     };
     Game.prototype.newGame = function(){
         this.keyLock = false;
@@ -376,7 +405,6 @@
                 this.btnAuto.innerHTML = '<span>托管</span><i class="iconfont icon-zidong"></i>';
                 this.mode = "manual";
                 this.autoBehavior.length=0;
-                // this.confirmBtn.click();
                 if(this.playTimeId){
                     clearInterval(this.playTimeId);
                     this.playTimeId=null;
@@ -485,6 +513,9 @@
         this.confirmBtn.onclick = function(){
             var speed = this.settingDiv.querySelector("input[name='speed']:checked").value;
             switch(speed){
+                case "veryFast":
+                    this.intervalTime = 5;
+                    break;
                 case "fast":
                     this.intervalTime = 80;
                     break;
