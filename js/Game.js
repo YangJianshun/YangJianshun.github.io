@@ -69,7 +69,7 @@
                 }
                 moveState = this.snake.move();
             }else if(this.mode == "auto"){
-                    if(this.score>=795){this.btnPause.click();this.btnAuto.click();}//吃到这里，程序不知道怎么走，会陷入程序的死循环，因此，暂停并取消托管模式
+                    if(this.score>=797-this.foodNum){this.btnPause.click();this.btnAuto.click();}//吃到这里，程序不知道怎么走，会陷入程序的死循环，因此，暂停并取消托管模式
                     var snakeHeadCoor = snakeBodyArea[0];
                     var snakeTailCoor = snakeBodyArea[snakeBodyArea.length-1];
                     
