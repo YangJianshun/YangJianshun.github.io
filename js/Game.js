@@ -13,6 +13,7 @@
         this.mode = "manual";
         this.mapHeight = this.map.offsetHeight/this.snake.height;
         this.mapWidth = this.map.offsetWidth/this.snake.width;
+        this.mapSize = this.mapWidth*this.mapHeight
         this.autoBehavior = [];
         this.score = 0;
         this.rank = [];
@@ -69,7 +70,6 @@
                 }
                 moveState = this.snake.move();
             }else if(this.mode == "auto"){
-                    if(this.score>=797-this.foodNum){this.btnPause.click();this.btnAuto.click();}//吃到这里，程序不知道怎么走，会陷入程序的死循环，因此，暂停并取消托管模式
                     var snakeHeadCoor = snakeBodyArea[0];
                     var snakeTailCoor = snakeBodyArea[snakeBodyArea.length-1];
                     
@@ -77,23 +77,27 @@
                    
                     
                     //或吃不到，或者吃完过后找不到尾巴,就先绕着走，但是绕到的那个点必须能找到尾巴
-                    
                     var around=false;
-                    if(path.length==0 || (! catchUpTail(path,snakeBodyArea,this.mapWidth,this.mapHeight)) ){around=true;}
-                    else if(snakeBodyArea.length>550 && path.length>1){around=true;}
-                    else if(snakeBodyArea.length>400 && path.length>7){around=true;}
-                    else if(snakeBodyArea.length>300 && path.length>10){around=true;}
-                    else if(snakeBodyArea.length>200 && path.length>15){around=true;}
-                    else if(snakeBodyArea.length>50 && path.length>25){around=true;}
+                    if(this.score<this.mapSize-3-this.foodNum){//吃到这里
+                        if(path.length==0 || (! catchUpTail(path,snakeBodyArea,this.mapWidth,this.mapHeight)) ){around=true;}
+                        else if(snakeBodyArea.length/this.mapSize>0.6875 && path.length>1){around=true;}//550
+                        else if(snakeBodyArea.length/this.mapSize>0.5 && path.length/this.mapSize>0.00875){around=true;}//400
+                        else if(snakeBodyArea.length/this.mapSize>0.375 && path.length/this.mapSize>0.0125){around=true;}//300
+                        else if(snakeBodyArea.length/this.mapSize>0.25 && path.length/this.mapSize>0.01875){around=true;}//200
+                        else if(snakeBodyArea.length/this.mapSize>0.0625 && path.length/this.mapSize>0.03125){around=true;}//50
+                        // else if(snakeBodyArea.length>550 && path.length>1){around=true;}//550
+                        // else if(snakeBodyArea.length>400 && path.length>7){around=true;}//400
+                        // else if(snakeBodyArea.length>300 && path.length>10){around=true;}//300
+                        // else if(snakeBodyArea.length>200 && path.length>15){around=true;}//200
+                        // else if(snakeBodyArea.length>50 && path.length>25){around=true;}//50
+                    }
+
                     
-                    
-                    
-                    
-                    if(stepNum>800){//陷入死循环
+                    if(stepNum>this.mapSize){//陷入死循环
                         stepNum=0;
                         // offsetLst = [[0,-1],[0,1],[-1,0],[1,0]];
                         offsetLst = [offsetLst[2],offsetLst[3],offsetLst[0],offsetLst[1]];
-                    }
+                    }                       
 
                     if(around){                        
                         var nextCoor;
@@ -134,15 +138,15 @@
                     
                     this.autoBehavior = path2behavior(path);
                     // console.log(this.autoBehavior);
-                
+                      
 
                 //然后按照最短路径走
-                this.snake.direction = this.autoBehavior.shift();
-                moveState = this.snake.move();
+                this.snake.direction = this.autoBehavior.shift();                 
+                moveState = this.snake.move();                       
                 
                 
             }
-            stepNum+=1;
+            stepNum+=1;                       
             switch(moveState){
                 case -1:
                     //挂掉了
@@ -160,13 +164,13 @@
                     break;
                 case 1:
                     stepNum=0;
-                    if(foodArea.length<this.foodNum) this.food.generate();
+                    if(foodArea.length<this.foodNum) this.food.generate(this.mapSize);
                     this.score++;
                     this.loadScore();
                     break;
                 case 0:
                     break;
-            }
+            }                       
         }.bind(this),this.intervalTime);//MARK1
         // }.bind(this),2);
     };
@@ -530,7 +534,7 @@
             var tmpFoodNum = this.foodNumInput.value - this.foodNum;
             if(tmpFoodNum>0){
                 for(var i=0;i<tmpFoodNum;i++){
-                this.food.generate();
+                this.food.generate(this.mapSize);
                 }
             }
             this.foodNum = parseInt(this.foodNumInput.value);

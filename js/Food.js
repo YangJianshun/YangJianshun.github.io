@@ -16,9 +16,10 @@
             this.generate();
         }    
     }
-    Food.prototype.generate = function(){
+    Food.prototype.generate = function(mapSize){
         var map = this.map;
         //保证生成的食物不会掉落在蛇身体上或者其它食物上
+        if(snakeBodyArea.length + foodArea.length >= mapSize){return;}
         do{
             this.x = Math.floor(Math.random()*map.offsetWidth/this.width) 
             this.y = Math.floor(Math.random()*map.offsetHeight/this.height)
